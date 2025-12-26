@@ -9,7 +9,7 @@ if ($allowedOrigins === '*') {
 }
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'], // Permitir CORS em todas as rotas
     'allowed_methods' => ['*'],
     'allowed_origins' => $origins,
     'allowed_origins_patterns' => [],

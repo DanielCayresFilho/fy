@@ -38,7 +38,10 @@ class CorsMiddleware
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
         $response->headers->set('Access-Control-Expose-Headers', 'Authorization');
-        $response->headers->set('Access-Control-Allow-Credentials', env('CORS_SUPPORTS_CREDENTIALS', 'false'));
+        
+        // Para credentials, precisa ser string 'true' ou 'false'
+        $credentials = env('CORS_SUPPORTS_CREDENTIALS', 'false') === 'true' || env('CORS_SUPPORTS_CREDENTIALS', false) === true;
+        $response->headers->set('Access-Control-Allow-Credentials', $credentials ? 'true' : 'false');
 
         $maxAge = (int) env('CORS_MAX_AGE', 0);
         if ($maxAge > 0) {

@@ -12,7 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Aplicar CORS em todas as rotas API
+        // Aplicar CORS em TODAS as rotas (web e API)
+        $middleware->web(append: [
+            \App\Http\Middleware\CorsMiddleware::class,
+        ]);
+        
         $middleware->api(prepend: [
             \App\Http\Middleware\CorsMiddleware::class,
         ]);
