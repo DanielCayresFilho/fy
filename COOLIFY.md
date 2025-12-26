@@ -14,6 +14,12 @@
   - `DB_PASSWORD=<senha>`
   - `APP_KEY=<chave_do_laravel>` (gerar com `php artisan key:generate`)
   - `JWT_SECRET=<chave_jwt>` (gerar com `php artisan jwt:secret`)
+  - `CORS_ALLOWED_ORIGINS` - URLs permitidas para CORS
+    - Para permitir todas: `*` (não recomendado para produção)
+    - Para múltiplas URLs: `https://app.seudominio.com,https://www.seudominio.com`
+    - Exemplo: `https://app.seudominio.com`
+  - `CORS_MAX_AGE` (opcional) - Tempo de cache do preflight em segundos (padrão: 0)
+  - `CORS_SUPPORTS_CREDENTIALS` (opcional) - Permitir credenciais (padrão: false)
 
 ### Comandos de Setup (executar no container após deploy):
 ```bash
