@@ -25,8 +25,24 @@
 ```bash
 php artisan migrate
 php artisan db:seed
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+```
+
+### Configuração de CORS:
+Configure a variável `CORS_ALLOWED_ORIGINS` com a URL do seu frontend:
+```env
+CORS_ALLOWED_ORIGINS=https://fy.covenos.com.br
+```
+
+**Importante**: Após configurar/alterar o CORS, execute no container:
+```bash
+php artisan config:clear
 php artisan cache:clear
 ```
+
+Ou faça um rebuild do container no Coolify.
 
 ## Frontend (React/Vite)
 
