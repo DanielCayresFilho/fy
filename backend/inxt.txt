@@ -1,0 +1,46 @@
+Sistema financeiro nome Fy 
+
+Tecnologia Laravel 12 + Eloquent ORM + Postgres + Docker
+
+Tabelas
+
+users{
+    id int
+    email string
+    password string argon2id 
+    nome
+}
+
+accountFixes {
+    id int
+    name string
+    vencibleAt date
+    price money
+    
+}
+
+accountsVariable {
+    id int
+    name string
+    vencibleAt date
+    price money
+    quantity int
+    qtPayed int
+}
+
+creditcard {
+    id int
+    name string
+    vencibleAt date
+    totalLimite money
+}
+
+accountCredit {
+    cardID int
+    cardName string
+    name string
+    Totalprice money
+    installmentsPrice money
+    installments int
+    installmentsPayed int
+}
