@@ -1,0 +1,5 @@
+# Força LF para scripts shell (evita problemas no Docker)
+*.sh text eol=lf
+
+# Força LF para configs
+*.conf text eol=lf
