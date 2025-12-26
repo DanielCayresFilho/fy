@@ -2,23 +2,48 @@
 set -e
 
 echo "🚀 Starting Fy API..."
+echo "📋 Laravel will use environment variables from Coolify"
 
-# Verificar se .env existe, senão copiar do example
-if [ ! -f /var/www/.env ]; then
-    echo "⚙️  .env not found, copying from .env.example..."
-    cp /var/www/.env.example /var/www/.env
-fi
+# Apenas criar .env mínimo se APP_KEY/JWT_SECRET não estiverem no ambiente
+# Laravel vai pegar as outras vars do ambiente automaticamente!
+if [ -z "$APP_KEY" ] || [ -z "$JWT_SECRET" ]; then
+    echo "⚠️  APP_KEY or JWT_SECRET missing in environment!"
+    echo "📝 Creating minimal .env to generate secrets..."
 
-# Gerar APP_KEY se não existir
-if ! grep -q "APP_KEY=base64:" /var/www/.env; then
-    echo "🔑 Generating APP_KEY..."
-    php artisan key:generate --force
-fi
+    cat > /var/www/.env << 'ENVEOF'
+APP_KEY=
+JWT_SECRET=
+ENVEOF
 
-# Gerar JWT_SECRET se não existir ou estiver vazio
-if ! grep -q "JWT_SECRET=.*[a-zA-Z0-9]" /var/www/.env; then
-    echo "🔐 Generating JWT_SECRET..."
-    php artisan jwt:secret --force
+    # Gerar APP_KEY se não existir
+    if [ -z "$APP_KEY" ]; then
+        echo "🔑 Generating APP_KEY..."
+        php artisan key:generate --force
+        NEW_APP_KEY=$(grep APP_KEY /var/www/.env | cut -d '=' -f2)
+        export APP_KEY="$NEW_APP_KEY"
+        echo ""
+        echo "========================================="
+        echo "⚠️  IMPORTANT: Add to Coolify env vars:"
+        echo "APP_KEY=$NEW_APP_KEY"
+        echo "========================================="
+        echo ""
+    fi
+
+    # Gerar JWT_SECRET se não existir
+    if [ -z "$JWT_SECRET" ]; then
+        echo "🔐 Generating JWT_SECRET..."
+        JWT_SECRET=$(openssl rand -base64 64)
+        export JWT_SECRET
+        echo "JWT_SECRET=$JWT_SECRET" >> /var/www/.env
+        echo ""
+        echo "========================================="
+        echo "⚠️  IMPORTANT: Add to Coolify env vars:"
+        echo "JWT_SECRET=$JWT_SECRET"
+        echo "========================================="
+        echo ""
+    fi
+else
+    echo "✅ APP_KEY and JWT_SECRET found in environment"
 fi
 
 # Aguardar banco de dados estar pronto (máx 30 segundos)
@@ -45,7 +70,6 @@ php artisan view:clear
 echo "💾 Caching configurations..."
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
 
 # Garantir permissões corretas
 echo "🔒 Setting permissions..."

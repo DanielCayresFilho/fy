@@ -37,24 +37,36 @@ git push
 
 ### 3. Configurar variáveis de ambiente
 
-No Coolify, em **Environment Variables**, adicione/atualize:
+**IMPORTANTE:** Coolify injeta as variáveis direto no container, Laravel lê automaticamente!
+
+**Opção A - Gerar secrets localmente (recomendado):**
+```bash
+# Gerar APP_KEY
+php -r "echo 'base64:' . base64_encode(random_bytes(32)) . PHP_EOL;"
+
+# Gerar JWT_SECRET
+openssl rand -base64 64
+```
+
+**Opção B - Deixar vazio (container gera e mostra no log)**
+
+No Coolify, configure:
 
 ```env
-# Essas serão geradas automaticamente (deixe vazio):
-APP_KEY=
-JWT_SECRET=
+# Secrets (use os gerados ou deixe vazio)
+APP_KEY=base64:XXXXX
+JWT_SECRET=YYYYY
 
-# OBRIGATÓRIO - Configure com o domínio do seu frontend:
+# OBRIGATÓRIO
 CORS_ALLOWED_ORIGINS=https://fy.covenos.com.br
-
-# Configure com as credenciais do seu banco:
-DB_HOST=seu-postgres-host
+DB_HOST=seu-postgres-host-interno
 DB_DATABASE=fy_database
 DB_USERNAME=fy_user
 DB_PASSWORD=sua-senha
+APP_URL=https://fyapi.covenos.com.br
 ```
 
-**Consulte `.env.production` para ver todas as variáveis necessárias!**
+**Veja `COOLIFY_SETUP.md` para lista completa de variáveis!**
 
 ### 4. Redeploy
 

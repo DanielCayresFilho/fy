@@ -27,9 +27,9 @@ phpunit.xml
 .phpunit.result.cache
 
 # Development
-.env.example
 .env.local
 .env.development
+# .env.example é necessário no container!
 
 # Node modules (se houver)
 node_modules/
