@@ -30,8 +30,10 @@ git push
 
 1. Vá em **Settings** da sua aplicação
 2. Procure **Port** ou **Exposed Port**
-3. Altere de `9000` para **`80`**
+3. Configure como **`80`** (ou a porta que o Coolify usa: 80, 84, 87, etc)
 4. Salve
+
+**Nota**: O container internamente sempre usa porta 80. O Coolify mapeia automaticamente!
 
 ### 3. Configurar variáveis de ambiente
 
