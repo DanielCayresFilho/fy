@@ -18,11 +18,11 @@ class CorsMiddleware
         $allowedOrigins = env('CORS_ALLOWED_ORIGINS', '*');
         $origins = $allowedOrigins === '*' ? ['*'] : array_map('trim', explode(',', $allowedOrigins));
 
-        $response = $next($request);
-
-        // Se for um preflight request (OPTIONS)
+        // Se for um preflight request (OPTIONS), responder imediatamente
         if ($request->getMethod() === 'OPTIONS') {
             $response = response('', 200);
+        } else {
+            $response = $next($request);
         }
 
         // Aplicar headers CORS
@@ -39,7 +39,7 @@ class CorsMiddleware
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
         $response->headers->set('Access-Control-Expose-Headers', 'Authorization');
         $response->headers->set('Access-Control-Allow-Credentials', env('CORS_SUPPORTS_CREDENTIALS', 'false'));
-        
+
         $maxAge = (int) env('CORS_MAX_AGE', 0);
         if ($maxAge > 0) {
             $response->headers->set('Access-Control-Max-Age', $maxAge);
