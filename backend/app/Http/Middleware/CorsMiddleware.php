@@ -15,45 +15,46 @@ class CorsMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // OBTER ORIGIN DA REQUISIÇÃO
-        $origin = $request->headers->get('Origin');
-        
-        // OBTER ORIGENS PERMITIDAS
-        $allowedOrigins = env('CORS_ALLOWED_ORIGINS', '*');
-        $origins = $allowedOrigins === '*' ? ['*'] : array_map('trim', explode(',', $allowedOrigins));
-
-        // SE FOR OPTIONS (PREFLIGHT), RESPONDER IMEDIATAMENTE
+        // Se for OPTIONS (preflight), responder imediatamente
         if ($request->getMethod() === 'OPTIONS') {
             $response = response('', 200);
         } else {
-            // Se não for OPTIONS, processar normalmente
             $response = $next($request);
         }
 
-        // APLICAR HEADERS CORS EM TODOS OS CASOS
-        if (in_array('*', $origins)) {
-            // Permitir todas as origens
+        // Obter origin da requisição
+        $origin = $request->headers->get('Origin');
+        
+        // Obter origens permitidas do .env
+        $allowedOrigins = env('CORS_ALLOWED_ORIGINS', '*');
+        
+        // Aplicar Access-Control-Allow-Origin
+        if ($allowedOrigins === '*') {
             $response->headers->set('Access-Control-Allow-Origin', '*');
-        } elseif ($origin && in_array($origin, $origins)) {
-            // Permitir origem específica
+        } elseif ($origin && str_contains($allowedOrigins, $origin)) {
             $response->headers->set('Access-Control-Allow-Origin', $origin);
-        } elseif (count($origins) > 0) {
-            // Se tiver origens configuradas mas a origin não está na lista, ainda permite a primeira (fallback)
-            $response->headers->set('Access-Control-Allow-Origin', $origins[0]);
+        } elseif ($origin) {
+            // Fallback: permite a origin se ela estiver na lista (com vírgulas)
+            $origins = array_map('trim', explode(',', $allowedOrigins));
+            if (in_array($origin, $origins)) {
+                $response->headers->set('Access-Control-Allow-Origin', $origin);
+            } elseif (count($origins) > 0) {
+                // Último fallback: permite a primeira origem configurada
+                $response->headers->set('Access-Control-Allow-Origin', $origins[0]);
+            }
         }
 
-        // HEADERS OBRIGATÓRIOS
+        // Headers obrigatórios para CORS
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
         $response->headers->set('Access-Control-Expose-Headers', 'Authorization');
-        
-        // CREDENTIALS
-        $credentials = env('CORS_SUPPORTS_CREDENTIALS', 'false') === 'true' || env('CORS_SUPPORTS_CREDENTIALS', false) === true;
-        if ($credentials) {
+
+        // Credentials (opcional)
+        if (env('CORS_SUPPORTS_CREDENTIALS', 'false') === 'true') {
             $response->headers->set('Access-Control-Allow-Credentials', 'true');
         }
 
-        // MAX AGE
+        // Max Age (opcional)
         $maxAge = (int) env('CORS_MAX_AGE', 0);
         if ($maxAge > 0) {
             $response->headers->set('Access-Control-Max-Age', (string) $maxAge);
