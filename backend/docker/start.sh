@@ -61,6 +61,15 @@ done
 echo "📊 Running migrations..."
 php artisan migrate --force || echo "⚠️  Migration failed or no pending migrations"
 
+# Verificar variáveis críticas
+echo "🔍 Checking critical environment variables..."
+if [ -z "$CORS_ALLOWED_ORIGINS" ]; then
+    echo "⚠️  WARNING: CORS_ALLOWED_ORIGINS not set!"
+    echo "   CORS will default to '*' (allow all)"
+else
+    echo "✅ CORS_ALLOWED_ORIGINS: $CORS_ALLOWED_ORIGINS"
+fi
+
 # Limpar e cachear configurações
 echo "🗑️  Clearing caches..."
 php artisan config:clear

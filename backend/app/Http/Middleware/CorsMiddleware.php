@@ -24,24 +24,22 @@ class CorsMiddleware
 
         // Obter origin da requisição
         $origin = $request->headers->get('Origin');
-        
-        // Obter origens permitidas do .env
-        $allowedOrigins = env('CORS_ALLOWED_ORIGINS', '*');
-        
+
+        // Obter origens permitidas do config (NÃO usar env() aqui!)
+        $allowedOrigins = config('cors.allowed_origins', ['*']);
+
         // Aplicar Access-Control-Allow-Origin
-        if ($allowedOrigins === '*') {
+        if (in_array('*', $allowedOrigins)) {
             $response->headers->set('Access-Control-Allow-Origin', '*');
-        } elseif ($origin && str_contains($allowedOrigins, $origin)) {
+        } elseif ($origin && in_array($origin, $allowedOrigins)) {
             $response->headers->set('Access-Control-Allow-Origin', $origin);
-        } elseif ($origin) {
-            // Fallback: permite a origin se ela estiver na lista (com vírgulas)
-            $origins = array_map('trim', explode(',', $allowedOrigins));
-            if (in_array($origin, $origins)) {
-                $response->headers->set('Access-Control-Allow-Origin', $origin);
-            } elseif (count($origins) > 0) {
-                // Último fallback: permite a primeira origem configurada
-                $response->headers->set('Access-Control-Allow-Origin', $origins[0]);
-            }
+        } elseif ($origin && count($allowedOrigins) > 0) {
+            // Se a origin não está na lista, não permite (mais seguro)
+            // Mas pra debug, vamos permitir e logar
+            \Log::warning("CORS: Origin not in allowed list", [
+                'origin' => $origin,
+                'allowed' => $allowedOrigins
+            ]);
         }
 
         // Headers obrigatórios para CORS
@@ -49,13 +47,13 @@ class CorsMiddleware
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
         $response->headers->set('Access-Control-Expose-Headers', 'Authorization');
 
-        // Credentials (opcional)
-        if (env('CORS_SUPPORTS_CREDENTIALS', 'false') === 'true') {
+        // Credentials (usar config em vez de env)
+        if (config('cors.supports_credentials', false)) {
             $response->headers->set('Access-Control-Allow-Credentials', 'true');
         }
 
-        // Max Age (opcional)
-        $maxAge = (int) env('CORS_MAX_AGE', 0);
+        // Max Age (usar config em vez de env)
+        $maxAge = config('cors.max_age', 0);
         if ($maxAge > 0) {
             $response->headers->set('Access-Control-Max-Age', (string) $maxAge);
         }
