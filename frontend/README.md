@@ -32,7 +32,11 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Criar arquivo .env com a URL da API
+# Copie o .env.example e configure a URL do backend
+echo "VITE_API_URL=http://localhost:8000/api" > .env
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
@@ -60,8 +64,31 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Variáveis de Ambiente
+
+O frontend precisa da variável `VITE_API_URL` configurada para se conectar ao backend.
+
+### Desenvolvimento Local:
+Crie um arquivo `.env` na raiz do projeto frontend:
+```
+VITE_API_URL=http://localhost:8000/api
+```
+
+### Deploy no Coolify:
+Configure a variável de ambiente `VITE_API_URL` no Coolify ANTES do build:
+```
+VITE_API_URL=https://seu-backend.com/api
+```
+
+**Importante**: Variáveis `VITE_*` são injetadas em tempo de build, não em runtime. 
+Se você alterar essa variável, será necessário fazer um rebuild completo do container.
+
 ## How can I deploy this project?
 
+### Deploy no Coolify:
+Veja o arquivo `COOLIFY.md` na raiz do projeto para instruções detalhadas.
+
+### Deploy via Lovable:
 Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
 
 ## Can I connect a custom domain to my Lovable project?
