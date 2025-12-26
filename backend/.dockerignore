@@ -1,0 +1,60 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Documentation
+*.md
+README.md
+CHANGELOG.md
+LICENSE
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Tests
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Development
+.env.example
+.env.local
+.env.development
+
+# Node modules (se houver)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Storage (será criado no container)
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+!storage/logs/.gitignore
+!storage/framework/cache/.gitignore
+!storage/framework/sessions/.gitignore
+!storage/framework/views/.gitignore
+
+# Cache
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+.phpunit.cache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+.env.backup

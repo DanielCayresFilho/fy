@@ -1,6 +1,6 @@
 FROM php:8.3-fpm
 
-# Instalar dependências do sistema
+# Instalar dependências do sistema + nginx
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     zip \
     unzip \
+    nginx \
+    supervisor \
     && docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -23,16 +25,30 @@ WORKDIR /var/www
 # Copiar arquivos do projeto
 COPY . /var/www
 
-# Instalar dependências do Composer (incluindo dev para artisan)
-RUN composer install --optimize-autoloader --no-interaction
+# Instalar dependências do Composer
+RUN composer install --optimize-autoloader --no-dev --no-interaction
+
+# Copiar configuração do nginx
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx/default.conf /etc/nginx/sites-available/default
+
+# Copiar configuração do supervisor
+COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Criar diretórios necessários
+RUN mkdir -p /var/log/supervisor /run/php
 
 # Configurar permissões
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
     && chmod -R 755 /var/www/bootstrap/cache
 
-# Expor porta 9000 (PHP-FPM)
-EXPOSE 9000
+# Copiar script de inicialização
+COPY docker/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
-# Iniciar PHP-FPM
-CMD ["php-fpm"]
+# Expor porta 80 (nginx)
+EXPOSE 80
+
+# Iniciar via supervisor (nginx + php-fpm)
+CMD ["/usr/local/bin/start.sh"]
